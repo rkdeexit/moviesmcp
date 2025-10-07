@@ -27,13 +27,27 @@ npm run build
 
 ## Usage
 
-### Running the server
+### Local Usage (stdio transport)
+
+Run the server locally for Claude Desktop:
 
 ```bash
 npm start
 ```
 
-### Configuration for Claude Desktop
+### Remote Usage (SSE transport)
+
+Run the server with SSE transport for network access:
+
+```bash
+npm run start:sse
+```
+
+The server will start on `http://localhost:3000` with endpoints:
+- `/sse` - SSE endpoint for MCP clients
+- `/health` - Health check endpoint
+
+### Configuration for Claude Desktop (Local)
 
 Add this to your Claude Desktop configuration file:
 
@@ -64,10 +78,61 @@ Once configured in Claude Desktop, you can ask Claude questions like:
 - "What are the top rated movies?"
 - "What movies are coming out soon?"
 
+### Configuration for Claude Desktop (Remote)
+
+For remote MCP servers, add this to your Claude Desktop configuration:
+
+```json
+{
+  "mcpServers": {
+    "movies-remote": {
+      "url": "https://your-app.fly.dev/sse"
+    }
+  }
+}
+```
+
+## Deployment to Fly.io
+
+1. Install flyctl and authenticate:
+```bash
+brew install flyctl
+flyctl auth login
+```
+
+2. Build the project:
+```bash
+npm run build
+```
+
+3. Deploy to Fly.io:
+```bash
+flyctl deploy
+```
+
+The app will be deployed with:
+- Automatic HTTPS
+- Auto-start/stop machines
+- 256MB RAM, 1 shared CPU
+- Minimum 0 machines running (scales to zero)
+
+After deployment, update your Claude Desktop config with the deployed URL:
+```json
+{
+  "mcpServers": {
+    "movies": {
+      "url": "https://movies-mcp.fly.dev/sse"
+    }
+  }
+}
+```
+
 ## Development
 
 - Watch mode: `npm run watch`
 - Build: `npm run build`
+- Run stdio server (local): `npm start`
+- Run SSE server (remote): `npm run start:sse`
 
 ## API Key
 
